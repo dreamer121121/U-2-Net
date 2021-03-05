@@ -106,11 +106,11 @@ if torch.cuda.is_available():
     net.cuda()
 
 # ------- 4. define optimizer --------
-print("---define optimizer...")
+print("---define optimizer...",file=log_stream)
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
 
 # ------- 5. training process --------
-print("---start training...")
+print("---start training...",file=log_stream)
 ite_num = 0
 running_loss = 0.0
 running_tar_loss = 0.0
@@ -154,7 +154,7 @@ for epoch in range(0, epoch_num):
         del d0, d1, d2, d3, d4, d5, d6, loss2, loss
 
         print("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] train loss: %3f, tar: %3f " % (
-        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val))
+        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val),file=log_stream)
 
         if ite_num % save_frq == 0:
 
