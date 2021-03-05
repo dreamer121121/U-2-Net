@@ -24,6 +24,8 @@ from data_loader import SalObjDataset
 from model import U2NET
 from model import U2NETP
 
+log_stream = open('train.log','a')
+
 # ------- 1. define loss function --------
 
 bce_loss = nn.BCELoss(size_average=True)
@@ -77,10 +79,10 @@ for img_path in tra_img_name_list:
 
 	tra_lbl_name_list.append(data_dir + tra_label_dir + imidx + label_ext)
 
-print("---")
-print("train images: ", len(tra_img_name_list))
-print("train labels: ", len(tra_lbl_name_list))
-print("---")
+print("---",file=log_stream)
+print("train images: ", len(tra_img_name_list),file=log_stream)
+print("train labels: ", len(tra_lbl_name_list),file=log_stream)
+print("---",file=log_stream)
 
 train_num = len(tra_img_name_list)
 
@@ -161,4 +163,3 @@ for epoch in range(0, epoch_num):
             running_tar_loss = 0.0
             net.train()  # resume train
             ite_num4val = 0
-
