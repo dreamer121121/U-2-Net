@@ -24,6 +24,12 @@ from data_loader import SalObjDataset
 from model import U2NET
 from model import U2NETP
 
+
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
+
+#logger = logging.getLogger(__name__)
+
 log_stream = open('train.log','a')
 
 # ------- 1. define loss function --------
@@ -41,7 +47,7 @@ def muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, labels_v):
 	loss6 = bce_loss(d6,labels_v)
 
 	loss = loss0 + loss1 + loss2 + loss3 + loss4 + loss5 + loss6
-	print("l0: %3f, l1: %3f, l2: %3f, l3: %3f, l4: %3f, l5: %3f, l6: %3f\n"%(loss0.data.item(),loss1.data.item(),loss2.data.item(),loss3.data.item(),loss4.data.item(),loss5.data.item(),loss6.data.item()))
+	#print("l0: %3f, l1: %3f, l2: %3f, l3: %3f, l4: %3f, l5: %3f, l6: %3f\n"%(loss0.data.item(),loss1.data.item(),loss2.data.item(),loss3.data.item(),loss4.data.item(),loss5.data.item(),loss6.data.item()))
 
 	return loss0, loss
 
@@ -63,7 +69,7 @@ label_ext = '.png'
 model_dir = os.path.join(os.getcwd(), 'saved_models', model_name + os.sep)
 
 epoch_num = 100000
-batch_size_train = 32
+batch_size_train = 12
 batch_size_val = 1
 train_num = 0
 val_num = 0
@@ -83,10 +89,10 @@ for img_path in tra_img_name_list:
 
 	tra_lbl_name_list.append(data_dir + tra_label_dir + imidx + label_ext)
 
-print("---",file=log_stream)
-print("train images: ", len(tra_img_name_list),file=log_stream)
-print("train labels: ", len(tra_lbl_name_list),file=log_stream)
-print("---",file=log_stream)
+print("---")
+print("train images: ", len(tra_img_name_list))
+print("train labels: ", len(tra_lbl_name_list))
+print("---")
 
 train_num = len(tra_img_name_list)
 
@@ -119,11 +125,11 @@ if torch.cuda.is_available():
     net.cuda()
 
 # ------- 4. define optimizer --------
-print("---define optimizer...",file=log_stream)
+print("---define optimizer...")
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
 
 # ------- 5. training process --------
-print("---start training...",file=log_stream)
+print("---start training...")
 ite_num = 0
 running_loss = 0.0
 running_tar_loss = 0.0
@@ -136,7 +142,7 @@ def mae(SM,GT):
     pass
 
 def evaluate(epoch):
-    print("="*30+'Val'+'='*30,file=log_stream)
+    print("="*30+'Val'+'='*30+'\n')
     val_loss = 0.0
     net.eval()
     for i_test, data_test in enumerate(test_salobj_dataloader):
@@ -156,16 +162,14 @@ def evaluate(epoch):
         d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
         loss2, loss = muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, inputs_test_label)
         val_loss += loss
-        print("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] val loss: %3f" % (
-        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1)),file=log_stream)
-
-
-
-    pass
+        log_stream.write("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] val loss: %3f" % (
+        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
+        log_stream.flush()
 
 for epoch in range(0, epoch_num):
     net.train()
-
+    import datetime
+    start = datetime.datetime.now()
     for i, data in enumerate(salobj_dataloader):
         ite_num = ite_num + 1
         ite_num4val = ite_num4val + 1
@@ -199,8 +203,10 @@ for epoch in range(0, epoch_num):
         # del temporary outputs and loss
         del d0, d1, d2, d3, d4, d5, d6, loss2, loss
 
-        print("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] train loss: %3f, tar: %3f " % (
-        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val),file=log_stream)
+        log_stream.write("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] train loss: %3f, tar: %3f " % (
+        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val)+'\n')
+        
+        log_stream.flush()
 
         if ite_num % save_frq == 0:
 
@@ -209,3 +215,5 @@ for epoch in range(0, epoch_num):
             running_tar_loss = 0.0
             net.train()  # resume train
             ite_num4val = 0
+    end = datetime.datetime.now()
+    print(end-start)  
