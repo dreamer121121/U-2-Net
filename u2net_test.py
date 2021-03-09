@@ -21,6 +21,14 @@ from data_loader import SalObjDataset
 from model import U2NET # full size version 173.6 MB
 from model import U2NETP # small version u2net 4.7 MB
 
+def Mae(s,g):
+    """
+    calculate the metric mae for sod tasks
+    """
+    W,H = s.shape
+    return np.sum(abs(s-g)/(W*H))
+
+
 # normalize the predicted SOD probability map
 def normPRED(d):
     ma = torch.max(d)
@@ -111,6 +119,9 @@ def main():
         pred = d1[:,0,:,:]
         pred = normPRED(pred)
 
+        #calculate mae
+        mae += Mae(pred,)
+
         # save results to test_results folder
         if not os.path.exists(prediction_dir):
             os.makedirs(prediction_dir, exist_ok=True)
@@ -119,4 +130,5 @@ def main():
         del d1,d2,d3,d4,d5,d6,d7
 
 if __name__ == "__main__":
+    mae = 0
     main()
