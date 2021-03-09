@@ -42,7 +42,7 @@ class eval_dataset:
 
 
 for dataset in test_datasets:
-    sal_root = dataset_path_pre  +'/Pred/'
+    sal_root = dataset_path_pre  +'/Pred-F3Net/'
     gt_root = dataset_path  +'/GT/'
     test_loader = eval_dataset(sal_root, gt_root)
     mae,fm,sm,em,wfm= cal_mae(),cal_fm(test_loader.size),cal_sm(),cal_em(),cal_wfm()
