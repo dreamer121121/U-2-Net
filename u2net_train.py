@@ -60,9 +60,6 @@ data_dir = os.path.join(os.getcwd(), 'train_data' + os.sep)
 tra_image_dir = os.path.join('DUTS', 'DUTS-TR', 'DUTS-TR', 'im_aug' + os.sep)
 tra_label_dir = os.path.join('DUTS', 'DUTS-TR', 'DUTS-TR', 'gt_aug' + os.sep)
 
-test_image_dir = os.path.join('DUTS', 'DUTS-TE', 'DUTS-TE', 'im_aug' + os.sep)
-test_label_dir = os.path.join('DUTS', 'DUTS-TE', 'DUTS-TE', 'gt_aug' + os.sep)
-
 image_ext = '.jpg'
 label_ext = '.png'
 
@@ -75,7 +72,6 @@ train_num = 0
 val_num = 0
 
 tra_img_name_list = glob.glob(data_dir + tra_image_dir + '*' + image_ext)
-test_img_name_list = glob.glob(data_dir + tra_image_dir + '*' + image_ext)
 
 tra_lbl_name_list = []
 for img_path in tra_img_name_list:
@@ -104,15 +100,8 @@ salobj_dataset = SalObjDataset(
         RandomCrop(288),
         ToTensorLab(flag=0)]))
 
-test_salobj_dataset = SalObjDataset(
-    img_name_list=test_image_dir,
-    lbl_name_list=test_label_dir,
-    transform=transforms.Compose([RescaleT(320),
-                                  RandomCrop(288),
-                                  ToTensorLab(flag=0)]))
 
 salobj_dataloader = DataLoader(salobj_dataset, batch_size=batch_size_train, shuffle=True, num_workers=0)
-test_salobj_dataloader = DataLoader(test_salobj_dataset,batch_size=batch_size_val,shuffle=False)
 
 # ------- 3. define model --------
 # define the net
@@ -125,9 +114,7 @@ if torch.cuda.is_available():
     net.cuda()
 
 resume = True
-#if resume:
-#    checkpoint = torch.load('./saved_models/u2net/u2net_bce_itr_220000_train_0.183637_tar_0.016159.pth')
-#    net.load_state_dict(checkpoint)
+
 # ------- 4. define optimizer --------
 print("---define optimizer...")
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
@@ -146,35 +133,30 @@ running_tar_loss = 0.0
 ite_num4val = 0
 save_frq = 2000 # save the model every 2000 iterations
 
-
-def mae(SM,GT):
-    W,H = SM.shape
-    pass
-
-def evaluate(epoch):
-    print("="*30+'Val'+'='*30+'\n')
-    val_loss = 0.0
-    net.eval()
-    for i_test, data_test in enumerate(test_salobj_dataloader):
-
-        # print("inferencing:",test_img_name_list[i_test].split(os.sep)[-1])
-
-        inputs_test = data_test['image']
-        inputs_test_label = data_test['label']
-        inputs_test = inputs_test.type(torch.FloatTensor)
-        inputs_test_label = inputs_test_label.type(torch.FloatTensor)
-
-        if torch.cuda.is_available():
-            inputs_test,inputs_test_label = Variable(inputs_test.cuda()),Variable(inputs_test_label.cuda())
-        else:
-            inputs_test = Variable(inputs_test),Variable(inputs_test_label)
-
-        d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
-        loss2, loss = muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, inputs_test_label)
-        val_loss += loss
-        log_stream.write("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] val loss: %3f" % (
-        epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
-        log_stream.flush()
+# def evaluate(epoch):
+#     print("="*30+'Val'+'='*30+'\n')
+#     val_loss = 0.0
+#     net.eval()
+#     for i_test, data_test in enumerate(test_salobj_dataloader):
+#
+#         # print("inferencing:",test_img_name_list[i_test].split(os.sep)[-1])
+#
+#         inputs_test = data_test['image']
+#         inputs_test_label = data_test['label']
+#         inputs_test = inputs_test.type(torch.FloatTensor)
+#         inputs_test_label = inputs_test_label.type(torch.FloatTensor)
+#
+#         if torch.cuda.is_available():
+#             inputs_test,inputs_test_label = Variable(inputs_test.cuda()),Variable(inputs_test_label.cuda())
+#         else:
+#             inputs_test = Variable(inputs_test),Variable(inputs_test_label)
+#
+#         d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
+#         loss2, loss = muti_bce_loss_fusion(d0, d1, d2, d3, d4, d5, d6, inputs_test_label)
+#         val_loss += loss
+#         log_stream.write("[epoch: %3d/%3d, batch: %5d/%5d, ite: %d] val loss: %3f" % (
+#         epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
+#         log_stream.flush()
 
 for epoch in range(352, epoch_num):
     net.train()
@@ -228,4 +210,4 @@ for epoch in range(352, epoch_num):
             ite_num4val = 0
             
     end = datetime.datetime.now()
-    print(end-start)  
+    print("1 Epoch cost time: ",end-start)

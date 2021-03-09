@@ -235,10 +235,6 @@ class SalObjDataset(Dataset):
 		return len(self.image_name_list)
 
 	def __getitem__(self,idx):
-
-		# image = Image.open(self.image_name_list[idx])#io.imread(self.image_name_list[idx])
-		# label = Image.open(self.label_name_list[idx])#io.imread(self.label_name_list[idx])
-
 		image = io.imread(self.image_name_list[idx])
 		imname = self.image_name_list[idx]
 		imidx = np.array([idx])
@@ -253,7 +249,6 @@ class SalObjDataset(Dataset):
 			label = label_3[:,:,0]
 		elif(2==len(label_3.shape)):
 			label = label_3
-
 		if(3==len(image.shape) and 2==len(label.shape)):
 			label = label[:,:,np.newaxis]
 		elif(2==len(image.shape) and 2==len(label.shape)):
