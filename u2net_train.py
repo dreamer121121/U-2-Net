@@ -124,13 +124,23 @@ elif(model_name=='u2netp'):
 if torch.cuda.is_available():
     net.cuda()
 
+resume = True
+#if resume:
+#    checkpoint = torch.load('./saved_models/u2net/u2net_bce_itr_220000_train_0.183637_tar_0.016159.pth')
+#    net.load_state_dict(checkpoint)
 # ------- 4. define optimizer --------
 print("---define optimizer...")
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
 
+if resume:
+    checkpoint = torch.load('./saved_models/u2net/u2net_bce_itr_308000_train_0.164602_tar_0.014275.pth')
+    net.load_state_dict(checkpoint)
+    optimizer.load_state_dict(torch.load('./saved_models/u2net/u2net_opt_itr_308000_train_0.164602_tar_0.014275.pth'))
+
+
 # ------- 5. training process --------
 print("---start training...")
-ite_num = 0
+ite_num = 308000
 running_loss = 0.0
 running_tar_loss = 0.0
 ite_num4val = 0
@@ -166,7 +176,7 @@ def evaluate(epoch):
         epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
         log_stream.flush()
 
-for epoch in range(0, epoch_num):
+for epoch in range(352, epoch_num):
     net.train()
     import datetime
     start = datetime.datetime.now()
@@ -211,9 +221,11 @@ for epoch in range(0, epoch_num):
         if ite_num % save_frq == 0:
 
             torch.save(net.state_dict(), model_dir + model_name+"_bce_itr_%d_train_%3f_tar_%3f.pth" % (ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val))
+            torch.save(optimizer.state_dict(), model_dir + model_name+"_opt_itr_%d_train_%3f_tar_%3f.pth" % (ite_num, running_loss / ite_num4val, running_tar_loss / ite_num4val))
             running_loss = 0.0
             running_tar_loss = 0.0
             net.train()  # resume train
             ite_num4val = 0
+            
     end = datetime.datetime.now()
     print(end-start)  
