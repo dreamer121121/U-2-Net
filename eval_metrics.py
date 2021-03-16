@@ -42,8 +42,8 @@ class eval_dataset:
 
 
 for dataset in test_datasets:
-    sal_root = dataset_path_pre  +'/Pred-F3Net/'
-    gt_root = dataset_path  +'/GT/'
+    sal_root = dataset_path_pre  +'/test_data/u2net_results/'
+    gt_root = dataset_path  +'/train_data/DUTS/DUTS-TE/gt_aug'
     test_loader = eval_dataset(sal_root, gt_root)
     mae,fm,sm,em,wfm= cal_mae(),cal_fm(test_loader.size),cal_sm(),cal_em(),cal_wfm()
     for i in range(test_loader.size):

@@ -40,6 +40,7 @@ def save_output(image_name,pred,d_dir):
     img_name = image_name.split(os.sep)[-1]
     image = io.imread(image_name)
     imo = im.resize((image.shape[1],image.shape[0]),resample=Image.BILINEAR)
+    print('-----image.shape-----',image.shape)    
 
     pb_np = np.array(imo)
 
@@ -58,7 +59,7 @@ def main():
 
 
 
-    image_dir = os.path.join(os.getcwd(), 'test_data', 'test_images')
+    image_dir = os.path.join(os.getcwd(), 'test_data', 'im_aug')
     prediction_dir = os.path.join(os.getcwd(), 'test_data', model_name + '_results' + os.sep)
     model_dir = os.path.join(os.getcwd(), 'saved_models', model_name, model_name + '.pth')
 

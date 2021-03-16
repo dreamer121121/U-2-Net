@@ -120,14 +120,14 @@ print("---define optimizer...")
 optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
 
 if resume:
-    checkpoint = torch.load('./saved_models/u2net/u2net_bce_itr_308000_train_0.164602_tar_0.014275.pth')
+    checkpoint = torch.load('./saved_models/u2net/u2net_bce_itr_660000_train_0.126644_tar_0.010536.pth')
     net.load_state_dict(checkpoint)
-    optimizer.load_state_dict(torch.load('./saved_models/u2net/u2net_opt_itr_308000_train_0.164602_tar_0.014275.pth'))
+    optimizer.load_state_dict(torch.load('./saved_models/u2net/u2net_opt_itr_660000_train_0.126644_tar_0.010536.pth'))
 
 
 # ------- 5. training process --------
 print("---start training...")
-ite_num = 308000
+ite_num = 660000
 running_loss = 0.0
 running_tar_loss = 0.0
 ite_num4val = 0
@@ -158,7 +158,7 @@ save_frq = 2000 # save the model every 2000 iterations
 #         epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
 #         log_stream.flush()
 
-for epoch in range(352, epoch_num):
+for epoch in range(755, epoch_num):
     net.train()
     import datetime
     start = datetime.datetime.now()
@@ -167,6 +167,9 @@ for epoch in range(352, epoch_num):
         ite_num4val = ite_num4val + 1
 
         inputs, labels = data['image'], data['label']
+        #print('inputs.shape: ',inputs.shape)
+        #import sys
+        #sys.exigt(0)
 
         inputs = inputs.type(torch.FloatTensor)
         labels = labels.type(torch.FloatTensor)
