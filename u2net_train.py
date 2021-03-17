@@ -111,9 +111,10 @@ elif(model_name=='u2netp'):
     net = U2NETP(3,1)
 
 if torch.cuda.is_available():
+    nn.DataParallel(net,device_ids=[0,1,2,3])
     net.cuda()
 
-resume = True
+resume = False
 
 # ------- 4. define optimizer --------
 print("---define optimizer...")
