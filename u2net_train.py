@@ -65,8 +65,8 @@ label_ext = '.png'
 
 model_dir = os.path.join(os.getcwd(), 'saved_models', model_name + os.sep)
 
-epoch_num = 100000
-batch_size_train = 12
+epoch_num = 700
+batch_size_train = 48
 batch_size_val = 1
 train_num = 0
 val_num = 0
@@ -111,7 +111,7 @@ elif(model_name=='u2netp'):
     net = U2NETP(3,1)
 
 if torch.cuda.is_available():
-    nn.DataParallel(net,device_ids=[0,1,2,3])
+    net = nn.DataParallel(net,device_ids=[0,1,2,3])
     net.cuda()
 
 resume = False
