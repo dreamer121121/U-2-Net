@@ -128,7 +128,7 @@ if resume:
 
 # ------- 5. training process --------
 print("---start training...")
-ite_num = 660000
+ite_num = 0
 running_loss = 0.0
 running_tar_loss = 0.0
 ite_num4val = 0
@@ -159,7 +159,7 @@ save_frq = 2000 # save the model every 2000 iterations
 #         epoch + 1, epoch_num, (i + 1) * batch_size_train, train_num, ite_num, running_loss / (i_test+1))+'\n')
 #         log_stream.flush()
 
-for epoch in range(755, epoch_num):
+for epoch in range(0, epoch_num):
     net.train()
     import datetime
     start = datetime.datetime.now()
