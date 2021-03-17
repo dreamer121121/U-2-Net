@@ -240,28 +240,28 @@ class SalObjDataset(Dataset):
 		imname = self.image_name_list[idx]
 		imidx = np.array([idx])
 
-		try:
-			if(0==len(self.label_name_list)):
-				label_3 = np.zeros(image.shape)
-			else:
-				label_3 = io.imread(self.label_name_list[idx])
+		# try:
+		if(0==len(self.label_name_list)):
+			label_3 = np.zeros(image.shape)
+		else:
+			label_3 = io.imread(self.label_name_list[idx])
 
-			label = np.zeros(label_3.shape[0:2])
-			if(3==len(label_3.shape)):
-				label = label_3[:,:,0]
-			elif(2==len(label_3.shape)):
-				label = label_3
-			if(3==len(image.shape) and 2==len(label.shape)):
-				label = label[:,:,np.newaxis]
-			elif(2==len(image.shape) and 2==len(label.shape)):
-				image = image[:,:,np.newaxis]
-				label = label[:,:,np.newaxis]
+		label = np.zeros(label_3.shape[0:2])
+		if(3==len(label_3.shape)):
+			label = label_3[:,:,0]
+		elif(2==len(label_3.shape)):
+			label = label_3
+		if(3==len(image.shape) and 2==len(label.shape)):
+			label = label[:,:,np.newaxis]
+		elif(2==len(image.shape) and 2==len(label.shape)):
+			image = image[:,:,np.newaxis]
+			label = label[:,:,np.newaxis]
 
-			sample = {'imidx':imidx, 'image':image, 'label':label}
+		sample = {'imidx':imidx, 'image':image, 'label':label}
 
-			if self.transform:
-				sample = self.transform(sample)
+		if self.transform:
+			sample = self.transform(sample)
 
-			return sample
-		except Exception as e:
-			print("Error imname",imname)
+		return sample
+		# except Exception as e:
+		# 	print("Error imname",imname)
