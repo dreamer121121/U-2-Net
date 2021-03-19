@@ -40,7 +40,7 @@ def save_output(image_name,pred,d_dir):
     img_name = image_name.split(os.sep)[-1]
     image = io.imread(image_name)
     imo = im.resize((image.shape[1],image.shape[0]),resample=Image.BILINEAR)
-    print('-----image.shape-----',image.shape)    
+    #print('-----image.shape-----',image.shape)    
 
     pb_np = np.array(imo)
 
@@ -55,7 +55,7 @@ def save_output(image_name,pred,d_dir):
 def main():
 
     # --------- 1. get image path and name ---------
-    model_name='u2net'#u2netp
+    model_name='u2netp'#u2netp
 
 
 
@@ -92,7 +92,10 @@ def main():
     else:
         net.load_state_dict(torch.load(model_dir, map_location='cpu'))
     net.eval()
-
+    import datetime
+    #start = datetime.datetime.now()
+    total = datetime.datetime(1999,1,1)
+    cnt = 1
     # --------- 4. inference for each image ---------
     for i_test, data_test in enumerate(test_salobj_dataloader):
 
@@ -105,9 +108,10 @@ def main():
             inputs_test = Variable(inputs_test.cuda())
         else:
             inputs_test = Variable(inputs_test)
-
+        start = datetime.datetime.now()
         d1,d2,d3,d4,d5,d6,d7= net(inputs_test)
-
+        total += datetime.datetime.now()-start
+        print((total-datetime.datetime(1999,1,1))/cnt)
         # normalization
         pred = d1[:,0,:,:]
         pred = normPRED(pred)
@@ -116,7 +120,8 @@ def main():
         if not os.path.exists(prediction_dir):
             os.makedirs(prediction_dir, exist_ok=True)
         save_output(img_name_list[i_test],pred,prediction_dir)
-
+        #print((datetime.datetime.now()-start)/(i_test+1))
+        cnt += 1
         del d1,d2,d3,d4,d5,d6,d7
 
 if __name__ == "__main__":

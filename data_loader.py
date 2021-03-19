@@ -220,7 +220,7 @@ class ToTensorLab(object):
 		tmpImg = tmpImg.transpose((2, 0, 1))
 		tmpLbl = label.transpose((2, 0, 1))
 
-		return {'imidx':torch.from_numpy(imidx), 'image': torch.from_numpy(tmpImg), 'label': torch.from_numpy(tmpLbl)}
+		return {'imidx':torch.from_numpy(imidx.copy()), 'image': torch.from_numpy(tmpImg.copy()), 'label': torch.from_numpy(tmpLbl.copy())}
 
 class SalObjDataset(Dataset):
 	def __init__(self,img_name_list,lbl_name_list,transform=None):
@@ -256,7 +256,9 @@ class SalObjDataset(Dataset):
 		elif(2==len(image.shape) and 2==len(label.shape)):
 			image = image[:,:,np.newaxis]
 			label = label[:,:,np.newaxis]
-
+		else:
+			image = np.zeros((224,224,1))
+			label = np.zeros((224,224,1))
 		sample = {'imidx':imidx, 'image':image, 'label':label}
 
 		if self.transform:
